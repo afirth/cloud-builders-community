@@ -44,8 +44,14 @@ fi
 echo "Running: helm repo update"
 helm repo update
 
+
 # check if Tillerless value 'TILLERLESS=true' is set, then run a local tiller server with the secret backend
 if [ "$TILLERLESS" = true ]; then
+# check if tiller-namespace exists, otherwise create it (helm --init would usually do this with server-side tiller'
+if [[ -n $TILLER_NAMESPACE ]]; then
+  echo "Creating tiller namespace $TILLER_NAMESPACE"
+  kubectl get namespace $TILLER_NAMESPACE || kubectl create namespace $TILLER_NAMESPACE
+fi
   echo "Starting local tiller server"
   #default inherits --listen localhost:44134 and TILLER_NAMESPACE
   #use the secret driver by default
