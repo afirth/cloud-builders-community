@@ -44,19 +44,19 @@ fi
 echo "Running: helm repo update"
 helm repo update
 
-# check if Tillerless value 'TILLERLESS=true' is provided then install and start the plugin
+# check if Tillerless value 'TILLERLESS=true' is set, then run a local tiller server with the secret backend
 if [ "$TILLERLESS" = true ]; then
-  echo "Installing Tillerless plugin"
-  helm plugin install https://github.com/rimusz/helm-tiller
-  echo "Starting Tillerless plugin"
-  helm tiller start-ci "$TILLER_NAMESPACE"
-  echo
+  echo "Starting local tiller server"
+  #default inherits --listen localhost:44134 and TILLER_NAMESPACE
+  #use the secret driver by default
+  tiller --storage=secret &
   export HELM_HOST=localhost:44134
   if [ "$DEBUG" = true ]; then
       echo "Running: helm $@"
   fi
   helm "$@"
-  helm tiller stop
+  echo "Stopping local tiller server"
+  pkill -f builder/tiller
 else
   if [ "$DEBUG" = true ]; then
       echo "Running: helm $@"
