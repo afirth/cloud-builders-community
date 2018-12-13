@@ -62,7 +62,7 @@ fi
   fi
   helm "$@"
   echo "Stopping local tiller server"
-  pkill -f builder/tiller
+  pkill tiller
 else
   if [ "$DEBUG" = true ]; then
       echo "Running: helm $@"
